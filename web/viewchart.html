@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Xem dữ liệu - Fetel HCMUS</title>
+    <script>
+        window.onload = function () {
+            var tempDataPoints = [];
+            var humiDataPoints = [];
+
+            alert('Đồ án môn học: Thiết kế logic khả trình \nFETEL HCMUS \nSinh viên: \nNguyễn Đình Duy 1620054\nVũ Đình Đỉnh 1620040');
+
+            var pTextAvailable = false;
+            // Initialize CanvasJS
+            var tempChart = new CanvasJS.Chart("tempChartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Nhiệt độ thời gian thực",
+                    fontFamily: "Roboto"
+                },
+                axisY: {
+                    title: "Nhiệt độ",
+                    fontFamily: "Roboto"
+                },
+                axisX: {
+                    title: "Thời gian",
+                    fontFamily: "Roboto"
+                },
+                data: [{
+                    type: "line",
+                    dataPoints: tempDataPoints
+                }]
+            });
+            var humiChart = new CanvasJS.Chart("humiChartContainer",{
+                animationEnabled: true,
+                theme: "light2",
+                title:{
+                    text: "Độ ẩm thời gian thực",
+                    fontFamily: "Roboto"
+                },
+                axisY:{
+                    title: "Độ ẩm",
+                    fontFamily: "Roboto"
+                },
+                axisX:{
+                    title: "Thời gian",
+                    fontFamily: "Roboto"
+                },
+                data: [{
+                    type: "line",
+                    dataPoints: humiDataPoints
+                }]
+
+            });
+
+
+
+            function updateChart(data)
+            {
+                var temporary1 = []; // for temperature
+                var temporary2 = []; // for humidity
+
+                for(var i = 0;i < data.length ;i++)
+                {
+                    temporary1.push({
+                        label: data[i].time,
+                        y: data[i].temp
+                    });
+                    temporary2.push({
+                        label: data[i].time,
+                        y: data[i].humi
+                    })
+                }
+                tempDataPoints = temporary1;
+                humiDataPoints = temporary2;
+
+                tempChart.options.data[0].dataPoints = tempDataPoints;
+                humiChart.options.data[0].dataPoints = humiDataPoints;
+
+                tempChart.render();
+                humiChart.render();
+                if(pTextAvailable == false)
+                {
+                    pText.innerHTML = "THÔNG TIN TỪ CẢM BIẾN";
+                    pTextAvailable = true;
+                }
+            }
+
+            function drawChart()
+            {
+                $.getJSON("/rest/getdata/10", updateChart);
+            }
+
+            setInterval(drawChart,1500);
+        }
+
+    </script>
+</head>
+<body>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+
+    <div id ="chartContainer" style="text-align: center;font-size: 30px;font-weight: bold;font-family: 'Roboto'">
+        <p id="pText" style="alignment: center"></p>
+        <div id="tempChartContainer" style="width: 50%; height: 400px;display: inline-block;float: left;"></div>
+        <div id="humiChartContainer" style="width: 50%; height: 400px;display: inline-block;float: right;"></div>
+    </div>
+
+
+</body>
+</html>
